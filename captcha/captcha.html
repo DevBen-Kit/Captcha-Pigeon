@@ -15,37 +15,140 @@
     }
 
     #captcha-container {
+      position: relative;
+      display: flex;
       background: white;
       width: 390px;
       height: 300px;
+      justify-content: center;
     }
 
-    /* Your style here... */
+    #div_text {
+      position: absolute;
+      background: #eee;
+      top: 5px;
+      padding: 5px;
+      border-radius: 5px;
+      text-align: center;
+      box-shadow: inset #333 0px 0px 5px;
+    }
+    
+    #span_text_score {
+      color: #0a0;
+    }
+    
+    #img_pigeon {
+      height: 90%;
+    }
+
+    #div_buttons {
+      position: absolute;
+      bottom: 0;
+    }
+    
+    .btn_gender {
+      background: white;
+      border: 1px solid #333;
+      border-radius: 5px;
+      padding: 2px 15px;
+      margin: 2px;
+      font-size: 20px;
+      font-weight: unset;
+      cursor: pointer;
+    }
+
+    .btn_gender:hover {
+      background: #aaa;
+    }
+
+div#div_image_container {padding: 5px;background: #000;text-align: center;}
   </style>
 </head>
 
 <body>
   <div id="captcha-container">
-    <!-- Add your CAPTCHA here: -->
-    Hello world!
-
-    <!-- We've added a sample button. Feel free to remove it: -->
-    <button id="solve">
-      Solve!
-    </button>
+    <div id="div_text">
+      <span id="span_text">Guess the gender of <span id="span_pigeonCount"></span> pigeons in a row!</span>
+      <span id="span_text_score" style="display: none;">Correct guesses <span id="span_pigeonCountCurrent"></span>/<span id="span_pigeonCountTotal"></span> pigeons</span>
+      <span id="span_text_incorrect" style="display: none;">Wrong gender!</span>
+    </div>
+    <div id="div_image_container">
+      <img id="img_pigeon" src="" alt="pigeon" />
+    </div>
+    <div id="div_buttons">
+      <button type="button" id="btn_female" class="btn_gender">Female</button>
+      <button type="button" id="btn_male" class="btn_gender">Male</button>
+    </div>
   </div>
 
   <script type="text/javascript">
     (function(window, document){
-      // This is how you tell the parent window that the CAPTCHA was successful.
+      const divImageContainer = document.getElementById('div_image_container');
+      const spanPigeonScore = document.getElementById('span_text_score');
+      const spanPigeonIncorrect = document.getElementById('span_text_incorrect');
+      const spanPigeonCount = document.getElementById('span_pigeonCount');
+      const spanPigeonTotal = document.getElementById('span_pigeonCountTotal');
+      const spanPigeonCurrent = document.getElementById('span_pigeonCountCurrent');
+      const imgPigeon = document.getElementById('img_pigeon');
+      const btnFemale = document.getElementById('btn_female');
+      const btnMale = document.getElementById('btn_male');
+      const pigeonCount = 2;
+      const correctCountTarget = 5;
+      var correctCount = 0;
+      var randomImageIndex = 0;
+
       function captchaSuccess() {
         window.top.postMessage("success", '*');
       }
 
-      // Your CAPTCHA code goes here, we've added a simple example below:
-      document.getElementById('solve')
-           .addEventListener('click', () => captchaSuccess());
+      function checkCorrect(choiceFemale) {
+        spanPigeonScore.style.display = "inherit";
 
+        if (randomImageIndex % 2 == 0 && choiceFemale)
+          correctCount++;
+        else if(randomImageIndex % 2 == 1 && !choiceFemale)
+          correctCount++;
+        else {
+          spanPigeonIncorrect.style.display = "inherit";
+          spanPigeonScore.style.display = "none";
+
+          btnFemale.setAttribute('disabled', '');
+          btnMale.setAttribute('disabled', '');
+
+          setTimeout(reset, 3000);
+
+          return false;
+        }
+
+        spanPigeonCurrent.innerText = correctCount;
+
+        if (correctCount == correctCountTarget)
+          captchaSuccess();
+        else 
+          refresh();
+      }
+
+      function refresh() {
+        randomImageIndex = Math.floor(Math.random() * pigeonCount) + 1;
+
+        imgPigeon.src = "Images/" + randomImageIndex + ".jpg";
+      }
+
+      function reset() {
+        correctCount = 0;
+        spanPigeonCurrent.innerText = correctCount;
+        spanPigeonIncorrect.style.display = "none";
+        btnFemale.removeAttribute('disabled');
+        btnMale.removeAttribute('disabled');
+      }
+      
+      spanPigeonCount.innerText = correctCountTarget;
+      spanPigeonCurrent.innerText = correctCount;
+      spanPigeonTotal.innerText = correctCountTarget;
+      btnFemale.addEventListener('click', () => checkCorrect(true));
+      btnMale.addEventListener('click', () => checkCorrect(false));
+
+      refresh();
     })(window, document);
   </script>
 </body>
