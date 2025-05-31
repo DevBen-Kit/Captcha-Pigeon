@@ -87,6 +87,7 @@
     <div id="div_buttons">
       <button type="button" id="btn_female" class="btn_gender">Female</button>
       <button type="button" id="btn_male" class="btn_gender">Male</button>
+      <button type="button" id="btn_joke" class="btn_gender" style="display:none">???</button>
     </div>
   </div>
 
@@ -101,7 +102,8 @@
       const imgPigeon = document.getElementById('img_pigeon');
       const btnFemale = document.getElementById('btn_female');
       const btnMale = document.getElementById('btn_male');
-      const pigeonCount = 10;
+      const btnJoke = document.getElementById('btn_joke');
+      const pigeonCount = 34;
       const correctCountTarget = 5;
       var correctCount = 0;
       var randomImageIndex = 0;
@@ -142,6 +144,17 @@
         randomImageIndex = Math.floor(Math.random() * pigeonCount) + 1;
 
         imgPigeon.src = "Images/" + randomImageIndex + ".jpg";
+
+        if (randomImageIndex % 10 == 0) {
+          btnFemale.style.display = "none";
+          btnMale.style.display = "none";
+          btnJoke.style.display = "inherit";
+        }
+        else{
+          btnFemale.style.display = "inherit";
+          btnMale.style.display = "inherit";
+          btnJoke.style.display = "none";
+        }
       }
 
       function reset() {
@@ -158,6 +171,7 @@
       spanPigeonTotal.innerText = correctCountTarget;
       btnFemale.addEventListener('click', () => checkCorrect(true));
       btnMale.addEventListener('click', () => checkCorrect(false));
+      btnJoke.addEventListener('click', () => refresh());
 
       refresh();
     })(window, document);
